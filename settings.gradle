@@ -1,0 +1,3 @@
+include ':exbanner'
+include ':app'
+rootProject.name = "ExBanner"
