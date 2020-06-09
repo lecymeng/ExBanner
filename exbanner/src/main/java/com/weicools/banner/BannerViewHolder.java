@@ -1,13 +1,15 @@
 package com.weicools.banner;
 
-import android.view.ViewGroup;
+import android.view.View;
 
 /**
  * @author weicools
- * @date 2020.06.08
+ * @date 2020.06.09
  */
-public interface BannerViewHolder<T, VH> {
-  VH onCreateHolder(ViewGroup parent, int viewType);
+public class BannerViewHolder {
+  public View itemView;
 
-  void onBindView(VH holder, T data, int position, int size);
+  public BannerViewHolder(View itemView) {
+    this.itemView = itemView;
+  }
 }

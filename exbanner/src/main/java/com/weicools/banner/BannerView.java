@@ -12,7 +12,7 @@ import java.util.List;
  * @date 2020.06.08
  */
 @SuppressWarnings("rawtypes")
-public class BannerView<T, VH extends BannerViewHolder> extends FrameLayout {
+public class BannerView<T, VH extends BannerFlexibleItem> extends FrameLayout {
   public BannerView(@NonNull Context context) {
     super(context);
   }

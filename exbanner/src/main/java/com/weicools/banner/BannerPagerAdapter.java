@@ -1,5 +1,6 @@
 package com.weicools.banner;
 
+import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
@@ -11,28 +12,69 @@ import java.util.List;
  * @author weicools
  * @date 2020.06.08
  */
-@SuppressWarnings("rawtypes")
-public class BannerPagerAdapter<T, VH extends BannerViewHolder> extends PagerAdapter {
-  private List<T> dataList = new ArrayList<>();
-  private List<VH> viewHoldList = new ArrayList<>();
+public class BannerPagerAdapter<I extends BannerFlexibleItem<BannerViewHolder>> extends PagerAdapter {
+  private List<I> flexibleItemList = new ArrayList<>();
+  private List<BannerViewHolder> viewHolderList = new ArrayList<>();
 
-  public void updateData(@NonNull List<T> dataList) {
-    if (dataList.isEmpty()) {
-      this.dataList.clear();
-      this.viewHoldList.clear();
+  @NonNull
+  private Context context;
+
+  public BannerPagerAdapter(@NonNull Context context) {
+    this.context = context;
+  }
+
+  public void updateData(@NonNull List<I> itemList) {
+    int itemListSize = itemList.size();
+    if (itemListSize == 0) {
+      viewHolderList.clear();
+      flexibleItemList.clear();
       notifyDataSetChanged();
       return;
     }
-    if (this.dataList.isEmpty() || this.dataList.size() != dataList.size()) {
-      this.dataList.clear();
-      for (int i = 0; i < dataList.size(); i++) {
 
+    boolean isViewTypeSame = true;
+    if (itemListSize == 1 && flexibleItemList.size() == 1) {
+      isViewTypeSame = itemList.get(0).getViewType() == flexibleItemList.get(0).getViewType();
+
+    } else if (itemListSize > 1 && itemListSize == flexibleItemList.size() - 2) {
+      for (int i = 0; i < itemListSize; i++) {
+        if (itemList.get(i).getViewType() != flexibleItemList.get(i + 1).getViewType()) {
+          isViewTypeSame = false;
+          break;
+        }
       }
+
+    } else {
+      isViewTypeSame = false;
     }
+
+    flexibleItemList.clear();
+    flexibleItemList.addAll(itemList);
+    if (itemListSize > 1) {
+      flexibleItemList.add(0, itemList.get(itemListSize - 1));
+      flexibleItemList.add(itemList.get(0));
+    }
+
+    int flexibleItemSize = flexibleItemList.size();
+    if (isViewTypeSame && viewHolderList.size() == flexibleItemSize) {
+      for (int i = 0; i < flexibleItemList.size(); i++) {
+        flexibleItemList.get(i).onBindView(viewHolderList.get(i), i, flexibleItemSize);
+      }
+      return;
+    }
+
+    viewHolderList.clear();
+    for (int i = 0; i < flexibleItemSize; i++) {
+      BannerFlexibleItem<BannerViewHolder> flexibleItem = flexibleItemList.get(i);
+      BannerViewHolder viewHolder = flexibleItem.createView(context);
+      flexibleItem.onBindView(viewHolder, i, flexibleItemSize);
+      viewHolderList.add(viewHolder);
+    }
+    notifyDataSetChanged();
   }
 
   @Override public int getCount() {
-    return viewHoldList.size();
+    return viewHolderList.size();
   }
 
   @Override public boolean isViewFromObject(@NonNull View view, @NonNull Object object) {
@@ -40,7 +82,9 @@ public class BannerPagerAdapter<T, VH extends BannerViewHolder> extends PagerAda
   }
 
   @NonNull @Override public Object instantiateItem(@NonNull ViewGroup container, int position) {
-    return super.instantiateItem(container, position);
+    View itemView = viewHolderList.get(position).itemView;
+    container.addView(itemView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+    return itemView;
   }
 
   @Override public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
