@@ -15,19 +15,19 @@ import java.lang.reflect.Field;
  * @author weicools
  * @date 2020.06.10
  */
-class ExViewPager extends ViewPager {
-  private static class ExScroller extends Scroller {
+class BannerViewPager extends ViewPager {
+  private static class BannerScroller extends Scroller {
     private int scrollDuration = 1000;
 
-    public ExScroller(Context context) {
+    public BannerScroller(Context context) {
       super(context);
     }
 
-    public ExScroller(Context context, Interpolator interpolator) {
+    public BannerScroller(Context context, Interpolator interpolator) {
       super(context, interpolator);
     }
 
-    public ExScroller(Context context, Interpolator interpolator, boolean flywheel) {
+    public BannerScroller(Context context, Interpolator interpolator, boolean flywheel) {
       super(context, interpolator, flywheel);
     }
 
@@ -47,15 +47,15 @@ class ExViewPager extends ViewPager {
   }
 
   @Nullable
-  private ExScroller exScroller;
+  private BannerScroller bannerScroller;
 
   private boolean disableTouchScroll;
 
-  public ExViewPager(@NonNull Context context) {
+  public BannerViewPager(@NonNull Context context) {
     super(context);
   }
 
-  public ExViewPager(@NonNull Context context, @Nullable AttributeSet attrs) {
+  public BannerViewPager(@NonNull Context context, @Nullable AttributeSet attrs) {
     super(context, attrs);
   }
 
@@ -65,16 +65,16 @@ class ExViewPager extends ViewPager {
 
   public void setScrollDuration(int duration) {
     try {
-      if (exScroller != null) {
-        exScroller.setDuration(duration);
+      if (bannerScroller != null) {
+        bannerScroller.setDuration(duration);
         return;
       }
 
       Field mField = ViewPager.class.getDeclaredField("mScroller");
       mField.setAccessible(true);
-      exScroller = new ExScroller(getContext());
-      exScroller.setDuration(duration);
-      mField.set(this, exScroller);
+      bannerScroller = new BannerScroller(getContext());
+      bannerScroller.setDuration(duration);
+      mField.set(this, bannerScroller);
     } catch (Exception e) {
       e.printStackTrace();
     }

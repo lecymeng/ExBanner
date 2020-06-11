@@ -39,7 +39,7 @@ public class BannerView extends FrameLayout {
 
   private long playIntervalMills = 3000L;
 
-  private ExViewPager viewPager;
+  private BannerViewPager viewPager;
   private BannerPagerAdapter pagerAdapter;
   private BannerHandler bannerHandler = new BannerHandler();
 
@@ -61,7 +61,7 @@ public class BannerView extends FrameLayout {
   //</editor-fold>
 
   private void init(Context context) {
-    viewPager = new ExViewPager(context);
+    viewPager = new BannerViewPager(context);
     addView(viewPager, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 
     viewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
