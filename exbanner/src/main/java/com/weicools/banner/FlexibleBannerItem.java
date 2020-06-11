@@ -7,11 +7,11 @@ import androidx.annotation.NonNull;
  * @author weicools
  * @date 2020.06.08
  */
-public interface FlexibleBannerItem<VH extends BannerViewHolder> {
+public interface FlexibleBannerItem {
 
-  VH createView(@NonNull Context context);
+  BannerViewHolder onCreateViewHolder(@NonNull Context context);
 
-  void onBindView(@NonNull Context context, @NonNull BannerViewHolder holder, int position);
+  void onBindViewHolder(@NonNull Context context, @NonNull BannerViewHolder holder, int position);
 
   int getViewType();
 }

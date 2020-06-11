@@ -14,7 +14,7 @@ import java.util.List;
  */
 public class BannerPagerAdapter extends PagerAdapter {
   private List<BannerViewHolder> viewHolderList = new ArrayList<>();
-  private List<FlexibleBannerItem<? extends BannerViewHolder>> flexibleItemList = new ArrayList<>();
+  private List<FlexibleBannerItem> bannerItemList = new ArrayList<>();
 
   @NonNull
   private Context context;
@@ -23,22 +23,22 @@ public class BannerPagerAdapter extends PagerAdapter {
     this.context = context;
   }
 
-  public void updateData(@NonNull List<? extends FlexibleBannerItem<? extends BannerViewHolder>> itemList) {
+  public void updateData(@NonNull List<? extends FlexibleBannerItem> itemList) {
     int itemListSize = itemList.size();
     if (itemListSize == 0) {
       viewHolderList.clear();
-      flexibleItemList.clear();
+      bannerItemList.clear();
       notifyDataSetChanged();
       return;
     }
 
     boolean isViewTypeSame = true;
-    if (itemListSize == 1 && flexibleItemList.size() == 1) {
-      isViewTypeSame = itemList.get(0).getViewType() == flexibleItemList.get(0).getViewType();
+    if (itemListSize == 1 && bannerItemList.size() == 1) {
+      isViewTypeSame = itemList.get(0).getViewType() == bannerItemList.get(0).getViewType();
 
-    } else if (itemListSize > 1 && itemListSize == flexibleItemList.size() - 2) {
+    } else if (itemListSize > 1 && itemListSize == bannerItemList.size() - 2) {
       for (int i = 0; i < itemListSize; i++) {
-        if (itemList.get(i).getViewType() != flexibleItemList.get(i + 1).getViewType()) {
+        if (itemList.get(i).getViewType() != bannerItemList.get(i + 1).getViewType()) {
           isViewTypeSame = false;
           break;
         }
@@ -48,26 +48,26 @@ public class BannerPagerAdapter extends PagerAdapter {
       isViewTypeSame = false;
     }
 
-    flexibleItemList.clear();
-    flexibleItemList.addAll(itemList);
+    bannerItemList.clear();
+    bannerItemList.addAll(itemList);
     if (itemListSize > 1) {
-      flexibleItemList.add(0, itemList.get(itemListSize - 1));
-      flexibleItemList.add(itemList.get(0));
+      bannerItemList.add(0, itemList.get(itemListSize - 1));
+      bannerItemList.add(itemList.get(0));
     }
 
-    int flexibleItemSize = flexibleItemList.size();
+    int flexibleItemSize = bannerItemList.size();
     if (isViewTypeSame && viewHolderList.size() == flexibleItemSize) {
-      for (int i = 0; i < flexibleItemList.size(); i++) {
-        flexibleItemList.get(i).onBindView(context, viewHolderList.get(i), i);
+      for (int i = 0; i < bannerItemList.size(); i++) {
+        bannerItemList.get(i).onBindViewHolder(context, viewHolderList.get(i), i);
       }
       return;
     }
 
     viewHolderList.clear();
     for (int i = 0; i < flexibleItemSize; i++) {
-      FlexibleBannerItem<? extends BannerViewHolder> flexibleItem = flexibleItemList.get(i);
-      BannerViewHolder viewHolder = flexibleItem.createView(context);
-      flexibleItem.onBindView(context, viewHolder, i);
+      FlexibleBannerItem flexibleItem = bannerItemList.get(i);
+      BannerViewHolder viewHolder = flexibleItem.onCreateViewHolder(context);
+      flexibleItem.onBindViewHolder(context, viewHolder, i);
       viewHolderList.add(viewHolder);
     }
     notifyDataSetChanged();

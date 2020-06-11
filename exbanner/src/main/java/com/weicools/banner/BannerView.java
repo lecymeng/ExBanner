@@ -88,7 +88,7 @@ public class BannerView extends FrameLayout {
     viewPager.setScrollDuration(1000);
   }
 
-  public void updateDataList(@NonNull List<? extends FlexibleBannerItem<? extends BannerViewHolder>> itemList) {
+  public void updateDataList(@NonNull List<? extends FlexibleBannerItem> itemList) {
     pagerAdapter.updateData(itemList);
     startBannerPlay();
   }
