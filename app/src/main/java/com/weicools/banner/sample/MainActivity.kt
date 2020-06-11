@@ -15,6 +15,7 @@ class MainActivity : AppCompatActivity() {
       ColorBannerItem(ColorBannerData(R.color.pink_bilibili, "哔哩粉")),
       ColorBannerItem(ColorBannerData(R.color.blue_zhihu, "知乎蓝")),
       ColorBannerItem(ColorBannerData(R.color.blue_cyan, "水鸭青")),
+      ImageBannerItem(R.drawable.img_bh3, "崩坏3 写春联，贴窗花"),
       ColorBannerItem(ColorBannerData(R.color.black_gaoduan, "高端黑"))
     )
 
