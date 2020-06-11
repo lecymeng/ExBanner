@@ -1,5 +1,6 @@
 package com.weicools.banner;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -89,5 +90,14 @@ class ExViewPager extends ViewPager {
     } catch (Exception ignore) {
       return false;
     }
+  }
+
+  @SuppressLint("ClickableViewAccessibility")
+  @Override
+  public boolean onTouchEvent(MotionEvent ev) {
+    if (disableTouchScroll) {
+      return false;
+    }
+    return super.onTouchEvent(ev);
   }
 }
