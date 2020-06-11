@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.widget.FrameLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,35 +16,34 @@ import java.util.List;
  * @author weicools
  * @date 2020.06.08
  */
-@SuppressWarnings("rawtypes")
-public class BannerView<I extends BannerFlexibleItem<BannerViewHolder>> extends FrameLayout {
+public class BannerView extends FrameLayout {
 
   //on onDetachedFromWindow remove all callback msg
   @SuppressLint("HandlerLeak")
   private class BannerHandler extends Handler {
     @Override
     public void handleMessage(@NonNull Message msg) {
-      if (msg.what == MSG_BANNER_LOOP) {
-        if (pagerAdapter == null || pagerAdapter.getCount() < 2) {
+      if (msg.what == MSG_BANNER_PLAY) {
+        if (pagerAdapter.getCount() < 2) {
           stopBannerPlay();
           return;
         }
         int item = viewPager.getCurrentItem();
         viewPager.setCurrentItem(++item, true);
-        bannerHandler.sendEmptyMessageDelayed(MSG_BANNER_LOOP, playIntervalTimeMills);
+        bannerHandler.sendEmptyMessageDelayed(MSG_BANNER_PLAY, playIntervalMills);
       }
     }
   }
 
-  private static final int MSG_BANNER_LOOP = 1;
+  private static final int MSG_BANNER_PLAY = 1;
 
-  private long playIntervalTimeMills = 3000L;
+  private long playIntervalMills = 3000L;
 
   private ExViewPager viewPager;
-  private BannerPagerAdapter<I> pagerAdapter;
-
+  private BannerPagerAdapter pagerAdapter;
   private BannerHandler bannerHandler = new BannerHandler();
 
+  //<editor-fold desc="Constructor">
   public BannerView(@NonNull Context context) {
     super(context);
     init(context);
@@ -58,57 +58,76 @@ public class BannerView<I extends BannerFlexibleItem<BannerViewHolder>> extends 
     super(context, attrs, defStyleAttr);
     init(context);
   }
+  //</editor-fold>
 
   private void init(Context context) {
     viewPager = new ExViewPager(context);
     addView(viewPager, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 
-    viewPager.setActionListener(new ExViewPager.ActionListener() {
-      @Override public void handleDown() {
-        stopBannerPlay();
-      }
-
-      @Override public void handleLeave() {
-        startBannerPlay();
-      }
-    });
-
     viewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-      @Override public void onPageSelected(int position) {
+      @Override
+      public void onPageSelected(int position) {
         super.onPageSelected(position);
       }
 
-      @Override public void onPageScrollStateChanged(int state) {
-        super.onPageScrollStateChanged(state);
+      @Override
+      public void onPageScrollStateChanged(int state) {
+        if (state == ViewPager.SCROLL_STATE_IDLE || state == ViewPager.SCROLL_STATE_DRAGGING) {
+          if (viewPager.getCurrentItem() == pagerAdapter.getCount() - 1) {
+            viewPager.setCurrentItem(1, false);
+          } else if (viewPager.getCurrentItem() == 0) {
+            viewPager.setCurrentItem(pagerAdapter.getCount() - 2, false);
+          }
+        }
       }
     });
 
-    pagerAdapter = new BannerPagerAdapter<>(context);
+    pagerAdapter = new BannerPagerAdapter(context);
     viewPager.setAdapter(pagerAdapter);
+
+    viewPager.setScrollDuration(1000);
   }
 
-  private void updateDataList(List<I> itemList) {
+  public void updateDataList(@NonNull List<? extends FlexibleBannerItem<? extends BannerViewHolder>> itemList) {
     pagerAdapter.updateData(itemList);
     startBannerPlay();
   }
 
   public void startBannerPlay() {
     stopBannerPlay();
-    if (pagerAdapter == null || pagerAdapter.getCount() < 2) {
+    if (pagerAdapter.getCount() < 2) {
       return;
     }
-    bannerHandler.sendEmptyMessageDelayed(MSG_BANNER_LOOP, playIntervalTimeMills);
+    bannerHandler.sendEmptyMessageDelayed(MSG_BANNER_PLAY, playIntervalMills);
   }
 
   public void stopBannerPlay() {
-    if (bannerHandler.hasMessages(MSG_BANNER_LOOP)) {
-      bannerHandler.removeMessages(MSG_BANNER_LOOP);
+    if (bannerHandler.hasMessages(MSG_BANNER_PLAY)) {
+      bannerHandler.removeMessages(MSG_BANNER_PLAY);
     }
   }
 
   @Override
   protected void onDetachedFromWindow() {
     stopBannerPlay();
+    bannerHandler.removeCallbacksAndMessages(null);
     super.onDetachedFromWindow();
+  }
+
+  @Override
+  public boolean dispatchTouchEvent(MotionEvent ev) {
+    switch (ev.getAction()) {
+      case MotionEvent.ACTION_DOWN:
+        stopBannerPlay();
+        break;
+      case MotionEvent.ACTION_UP:
+      case MotionEvent.ACTION_CANCEL:
+      case MotionEvent.ACTION_OUTSIDE:
+        startBannerPlay();
+        break;
+      default:
+        break;
+    }
+    return super.dispatchTouchEvent(ev);
   }
 }
