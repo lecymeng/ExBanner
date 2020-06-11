@@ -3,4 +3,10 @@
     <color name="colorPrimary">#6200EE</color>
     <color name="colorPrimaryDark">#3700B3</color>
     <color name="colorAccent">#03DAC5</color>
+
+    <color name="green_kuan">#44AF57</color>
+    <color name="pink_bilibili">#FE7198</color>
+    <color name="blue_zhihu">#0F94EF</color>
+    <color name="blue_cyan">#009688</color>
+    <color name="black_gaoduan">#212121</color>
 </resources>
