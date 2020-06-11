@@ -10,7 +10,7 @@ class MainActivity : AppCompatActivity() {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_main)
 
-    val imageDataList = mutableListOf(
+    val colorDataList = mutableListOf(
       ColorBannerItem(ColorBannerData(R.color.green_kuan, "酷安绿")),
       ColorBannerItem(ColorBannerData(R.color.pink_bilibili, "哔哩粉")),
       ColorBannerItem(ColorBannerData(R.color.blue_zhihu, "知乎蓝")),
@@ -18,6 +18,6 @@ class MainActivity : AppCompatActivity() {
       ColorBannerItem(ColorBannerData(R.color.black_gaoduan, "高端黑"))
     )
 
-    bannerView.updateItemList(imageDataList)
+    bannerView.updateItemList(colorDataList)
   }
 }
