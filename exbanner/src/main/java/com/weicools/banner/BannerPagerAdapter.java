@@ -12,18 +12,18 @@ import java.util.List;
  * @author weicools
  * @date 2020.06.08
  */
-public class BannerPagerAdapter extends PagerAdapter {
+class BannerPagerAdapter extends PagerAdapter {
   private List<BannerViewHolder> viewHolderList = new ArrayList<>();
   private List<FlexibleBannerItem> bannerItemList = new ArrayList<>();
 
   @NonNull
   private Context context;
 
-  public BannerPagerAdapter(@NonNull Context context) {
+  BannerPagerAdapter(@NonNull Context context) {
     this.context = context;
   }
 
-  public void updateData(@NonNull List<? extends FlexibleBannerItem> itemList) {
+  void updateData(@NonNull List<? extends FlexibleBannerItem> itemList) {
     int itemListSize = itemList.size();
     if (itemListSize == 0) {
       viewHolderList.clear();
