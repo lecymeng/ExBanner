@@ -18,7 +18,7 @@ import java.util.List;
  */
 public class BannerView extends FrameLayout {
 
-  //on onDetachedFromWindow remove all callback msg
+  //remove all callback msg on onDetachedFromWindow
   @SuppressLint("HandlerLeak")
   private class BannerHandler extends Handler {
     @Override
@@ -30,37 +30,40 @@ public class BannerView extends FrameLayout {
         }
         int item = viewPager.getCurrentItem();
         viewPager.setCurrentItem(++item, true);
-        bannerHandler.sendEmptyMessageDelayed(MSG_BANNER_PLAY, playIntervalMills);
+        bannerHandler.sendEmptyMessageDelayed(MSG_BANNER_PLAY, bannerConfig.playIntervalMills);
       }
     }
   }
 
   private static final int MSG_BANNER_PLAY = 1;
 
-  private long playIntervalMills = 3000L;
+  private BannerConfig bannerConfig;
 
   private BannerViewPager viewPager;
   private BannerPagerAdapter pagerAdapter;
+
   private BannerHandler bannerHandler = new BannerHandler();
 
   //<editor-fold desc="Constructor">
   public BannerView(@NonNull Context context) {
     super(context);
-    init(context);
+    init(context, null);
   }
 
   public BannerView(@NonNull Context context, @Nullable AttributeSet attrs) {
     super(context, attrs);
-    init(context);
+    init(context, attrs);
   }
 
   public BannerView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
     super(context, attrs, defStyleAttr);
-    init(context);
+    init(context, attrs);
   }
   //</editor-fold>
 
-  private void init(Context context) {
+  private void init(Context context, @Nullable AttributeSet attrs) {
+    bannerConfig = new BannerConfig(context, attrs);
+
     viewPager = new BannerViewPager(context);
     addView(viewPager, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 
@@ -98,7 +101,7 @@ public class BannerView extends FrameLayout {
     if (pagerAdapter.getCount() < 2) {
       return;
     }
-    bannerHandler.sendEmptyMessageDelayed(MSG_BANNER_PLAY, playIntervalMills);
+    bannerHandler.sendEmptyMessageDelayed(MSG_BANNER_PLAY, bannerConfig.playIntervalMills);
   }
 
   public void stopBannerPlay() {
