@@ -4,6 +4,18 @@
 
 ### Banner 使用
 
+#### 0. 布局中声明BannerView
+```xml
+<com.weicools.banner.BannerView
+    android:id="@+id/bannerView"
+    android:layout_width="0dp"
+    android:layout_height="0dp"
+    app:layout_constraintDimensionRatio="16:9"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent" />
+```
+
 #### 1. 定义ViewHolder 继承自BannerViewHolder
 ```java
 class ColorViewHolder extends BannerViewHolder {
