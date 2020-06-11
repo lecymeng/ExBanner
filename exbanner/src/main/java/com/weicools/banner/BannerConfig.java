@@ -12,7 +12,9 @@ import androidx.annotation.Nullable;
 class BannerConfig {
   public long playIntervalMills = 3000L;
 
-  BannerConfig(@NonNull Context context, @Nullable AttributeSet attrs) {
+  public boolean loop = true;
+  public boolean isAutoPlay = true;
 
+  BannerConfig(@NonNull Context context, @Nullable AttributeSet attrs) {
   }
 }

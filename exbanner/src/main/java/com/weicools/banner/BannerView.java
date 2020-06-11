@@ -10,6 +10,7 @@ import android.widget.FrameLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.viewpager.widget.ViewPager;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -24,7 +25,7 @@ public class BannerView extends FrameLayout {
     @Override
     public void handleMessage(@NonNull Message msg) {
       if (msg.what == MSG_BANNER_PLAY) {
-        if (pagerAdapter.getCount() < 2) {
+        if (pagerAdapter.getCount() < MIN_LOOP_ITEM_COUNT) {
           stopBannerPlay();
           return;
         }
@@ -35,7 +36,8 @@ public class BannerView extends FrameLayout {
     }
   }
 
-  private static final int MSG_BANNER_PLAY = 1;
+  private static final int MSG_BANNER_PLAY = 100;
+  private static final int MIN_LOOP_ITEM_COUNT = 2;
 
   private BannerConfig bannerConfig;
 
@@ -43,6 +45,9 @@ public class BannerView extends FrameLayout {
   private BannerPagerAdapter pagerAdapter;
 
   private BannerHandler bannerHandler = new BannerHandler();
+
+  private List<BannerViewHolder> viewHolderList = new ArrayList<>();
+  private List<FlexibleBannerItem> bannerItemList = new ArrayList<>();
 
   //<editor-fold desc="Constructor">
   public BannerView(@NonNull Context context) {
@@ -85,20 +90,69 @@ public class BannerView extends FrameLayout {
       }
     });
 
-    pagerAdapter = new BannerPagerAdapter(context);
+    pagerAdapter = new BannerPagerAdapter(viewHolderList);
     viewPager.setAdapter(pagerAdapter);
 
     viewPager.setScrollDuration(1000);
   }
 
-  public void updateDataList(@NonNull List<? extends FlexibleBannerItem> itemList) {
-    pagerAdapter.updateData(itemList);
+  public void updateItemList(@NonNull List<? extends FlexibleBannerItem> itemList) {
+    stopBannerPlay();
+    int itemListSize = itemList.size();
+    if (itemListSize == 0) {
+      viewHolderList.clear();
+      bannerItemList.clear();
+      pagerAdapter.notifyDataSetChanged();
+      return;
+    }
+
+    boolean isViewTypeSame = true;
+    if (itemListSize == 1 && bannerItemList.size() == 1) {
+      isViewTypeSame = itemList.get(0).getViewType() == bannerItemList.get(0).getViewType();
+
+    } else if (itemListSize > 1 && itemListSize == bannerItemList.size() - 2) {
+      for (int i = 0; i < itemListSize; i++) {
+        if (itemList.get(i).getViewType() != bannerItemList.get(i + 1).getViewType()) {
+          isViewTypeSame = false;
+          break;
+        }
+      }
+    } else {
+      isViewTypeSame = false;
+    }
+
+    bannerItemList.clear();
+    bannerItemList.addAll(itemList);
+    if (itemListSize >= MIN_LOOP_ITEM_COUNT) {
+      bannerItemList.add(0, itemList.get(itemListSize - 1));
+      bannerItemList.add(itemList.get(0));
+    }
+
+    int bannerItemListSize = bannerItemList.size();
+    if (isViewTypeSame && viewHolderList.size() == bannerItemListSize) {
+      for (int i = 0; i < bannerItemListSize; i++) {
+        bannerItemList.get(i).onBindViewHolder(getContext(), viewHolderList.get(i), i);
+      }
+      startBannerPlay();
+      return;
+    }
+
+    viewHolderList.clear();
+    for (int i = 0; i < bannerItemListSize; i++) {
+      FlexibleBannerItem flexibleItem = bannerItemList.get(i);
+      BannerViewHolder viewHolder = flexibleItem.onCreateViewHolder(getContext());
+      flexibleItem.onBindViewHolder(getContext(), viewHolder, i);
+      viewHolderList.add(viewHolder);
+    }
+    pagerAdapter.notifyDataSetChanged();
+
+    viewPager.setCurrentItem(1, false);
     startBannerPlay();
   }
 
   public void startBannerPlay() {
     stopBannerPlay();
-    if (pagerAdapter.getCount() < 2) {
+    if (pagerAdapter.getCount() < MIN_LOOP_ITEM_COUNT) {
       return;
     }
     bannerHandler.sendEmptyMessageDelayed(MSG_BANNER_PLAY, bannerConfig.playIntervalMills);
