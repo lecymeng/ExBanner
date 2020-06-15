@@ -44,6 +44,8 @@ public class BannerView extends FrameLayout {
 
   @Nullable
   private IndicatorView indicatorView;
+  @Nullable
+  private ViewPager.OnPageChangeListener pageChangeListener;
 
   private BannerConfig bannerConfig;
 
@@ -79,7 +81,7 @@ public class BannerView extends FrameLayout {
     addView(viewPager, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 
     viewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-      private int getIndicatorPosition(int position) {
+      private int getRealPosition(int position) {
         if (pagerAdapter.getCount() < MIN_LOOP_PAGE_COUNT) {
           return position;
         }
@@ -94,15 +96,23 @@ public class BannerView extends FrameLayout {
 
       @Override
       public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+        int realPosition = getRealPosition(position);
         if (indicatorView != null) {
-          indicatorView.onPageScrolled(getIndicatorPosition(position), positionOffset, positionOffsetPixels);
+          indicatorView.onPageScrolled(realPosition, positionOffset, positionOffsetPixels);
+        }
+        if (pageChangeListener != null) {
+          pageChangeListener.onPageScrolled(realPosition, positionOffset, positionOffsetPixels);
         }
       }
 
       @Override
       public void onPageSelected(int position) {
+        int realPosition = getRealPosition(position);
         if (indicatorView != null) {
-          indicatorView.onPageSelected(getIndicatorPosition(position));
+          indicatorView.onPageSelected(realPosition);
+        }
+        if (pageChangeListener != null) {
+          pageChangeListener.onPageSelected(realPosition);
         }
       }
 
@@ -110,6 +120,9 @@ public class BannerView extends FrameLayout {
       public void onPageScrollStateChanged(int state) {
         if (indicatorView != null) {
           indicatorView.onPageScrollStateChanged(state);
+        }
+        if (pageChangeListener != null) {
+          pageChangeListener.onPageScrollStateChanged(state);
         }
 
         if (state == ViewPager.SCROLL_STATE_IDLE || state == ViewPager.SCROLL_STATE_DRAGGING) {
@@ -126,6 +139,10 @@ public class BannerView extends FrameLayout {
     viewPager.setAdapter(pagerAdapter);
 
     viewPager.setScrollDuration(1000);
+  }
+
+  public void setPageChangeListener(@Nullable ViewPager.OnPageChangeListener pageChangeListener) {
+    this.pageChangeListener = pageChangeListener;
   }
 
   public void setIndicatorView(@Nullable IndicatorView indicatorView) {
