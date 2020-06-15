@@ -19,6 +19,7 @@ class MainActivity : AppCompatActivity() {
       ColorBannerItem(ColorBannerData(R.color.black_gaoduan, "高端黑"))
     )
 
+    bannerView.setIndicatorView(indicatorView)
     bannerView.updateItemList(colorDataList)
   }
 }
