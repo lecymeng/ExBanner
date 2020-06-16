@@ -149,6 +149,14 @@ public class BannerView extends FrameLayout {
     this.indicatorView = indicatorView;
   }
 
+  public void setPlayIntervalMills(long playIntervalMills) {
+    bannerConfig.playIntervalMills = playIntervalMills;
+  }
+
+  public void setScrollDuration(int duration) {
+    viewPager.setScrollDuration(duration);
+  }
+
   public void updateItemList(@NonNull List<? extends FlexibleBannerItem> itemList) {
     stopBannerPlay();
     int itemListSize = itemList.size();
@@ -156,6 +164,9 @@ public class BannerView extends FrameLayout {
       viewHolderList.clear();
       bannerItemList.clear();
       pagerAdapter.notifyDataSetChanged();
+      if (indicatorView != null) {
+        indicatorView.setIndicatorCount(0);
+      }
       return;
     }
 

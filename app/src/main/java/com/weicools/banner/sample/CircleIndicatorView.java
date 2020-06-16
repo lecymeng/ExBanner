@@ -22,31 +22,31 @@ public class CircleIndicatorView extends View implements IndicatorView {
 
   private int selectedPosition;
 
+  private int selectedColor;
+  private int unselectedColor;
+
   private float radius;
   private float centerY;
   private float startCenterX;
 
   private Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
-  private int selectedColor;
-  private int unselectedColor;
-
   public CircleIndicatorView(Context context) {
     super(context);
-    init(context, null);
+    init(context);
   }
 
   public CircleIndicatorView(Context context, @Nullable AttributeSet attrs) {
     super(context, attrs);
-    init(context, attrs);
+    init(context);
   }
 
   public CircleIndicatorView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
     super(context, attrs, defStyleAttr);
-    init(context, attrs);
+    init(context);
   }
 
-  private void init(Context context, @Nullable AttributeSet attrs) {
+  private void init(Context context) {
     indicatorItemSize = (int) (Resources.getSystem().getDisplayMetrics().density * 8);
     indicatorItemMargin = (int) (Resources.getSystem().getDisplayMetrics().density * 4);
 
@@ -61,11 +61,6 @@ public class CircleIndicatorView extends View implements IndicatorView {
   @Override
   protected void onDraw(Canvas canvas) {
     super.onDraw(canvas);
-    if (indicatorCount == 0) {
-      setVisibility(INVISIBLE);
-      return;
-    }
-    setVisibility(VISIBLE);
     for (int i = 0; i < indicatorCount; i++) {
       float centerX = startCenterX + i * indicatorItemSize + i * indicatorItemMargin;
       paint.setColor(selectedPosition == i ? selectedColor : unselectedColor);
@@ -75,16 +70,21 @@ public class CircleIndicatorView extends View implements IndicatorView {
 
   @Override
   public void setIndicatorCount(int indicatorCount) {
+    if (indicatorCount <= 1) {
+      setVisibility(INVISIBLE);
+      this.indicatorCount = indicatorCount;
+      return;
+    }
+
+    setVisibility(VISIBLE);
     if (this.indicatorCount == indicatorCount) {
       return;
     }
 
     this.indicatorCount = indicatorCount;
-    if (indicatorCount > 0) {
-      ViewGroup.LayoutParams layoutParams = getLayoutParams();
-      layoutParams.width = indicatorItemSize * indicatorCount + indicatorItemMargin * (indicatorCount - 1);
-      layoutParams.height = indicatorItemSize;
-    }
+    ViewGroup.LayoutParams layoutParams = getLayoutParams();
+    layoutParams.width = indicatorItemSize * indicatorCount + indicatorItemMargin * (indicatorCount - 1);
+    layoutParams.height = indicatorItemSize;
 
     invalidate();
   }
